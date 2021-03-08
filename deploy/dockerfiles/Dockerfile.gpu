@@ -1,9 +1,14 @@
 FROM tensorflow/tensorflow:1.12.0-devel-gpu
-MAINTAINER Akshay Bhat <akshayubhat@gmail.com>
+RUN  sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
+RUN  apt-get clean
+#MAINTAINER Akshay Bhat <akshayubhat@gmail.com>
 RUN apt-get update -q && apt-get install -y wget xz-utils
 WORKDIR "/bin/"
-RUN wget https://www.dropbox.com/s/bjyzb8hytdwp2tp/ffmpeg-release-64bit-static.tar.xz
-RUN tar xvfJ ffmpeg-release-64bit-static.tar.xz
+RUN wget https://github.com/FFmpeg/FFmpeg/releases/download/n3.0/ffmpeg-3.0.tar.xz
+#https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz 
+#https://www.dropbox.com/s/bjyzb8hytdwp2tp/ffmpeg-release-64bit-static.tar.xz
+RUN tar xvfJ ffmpeg-3.0.tar.xz 
+#ffmpeg-release-64bit-static.tar.xz
 RUN mv ffmpeg*/* .
 WORKDIR "/root/"
 RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
@@ -22,7 +27,8 @@ RUN pip install --upgrade cffi
 RUN pip install --no-deps keras
 RUN pip install -r requirements.txt
 RUN pip install pip --upgrade
-RUN pip install --no-cache-dir http://download.pytorch.org/whl/cu90/torch-0.3.1-cp27-cp27mu-linux_x86_64.whl
+RUN pip install --no-cache-dir https://download.pytorch.org/whl/cu90/torch-0.3.1-cp27-cp27mu-linux_x86_64.whl
+#http://download.pytorch.org/whl/cu90/torch-0.3.1-cp27-cp27mu-linux_x86_64.whl
 RUN pip install --no-cache-dir mxnet-cu90
 RUN pip install torchvision
 RUN apt-get install -y libhdf5-dev
@@ -43,7 +49,9 @@ WORKDIR "/root/thirdparty/dlib"
 RUN git reset --hard 929c630b381d444bbf5d7aa622e3decc7785ddb2
 RUN python setup.py install --yes USE_AVX_INSTRUCTIONS  # --yes DLIB_USE_CUDA --set CMAKE_PREFIX_PATH=/usr/local/cuda --set CUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda/bin/ --clean
 WORKDIR "/root/thirdparty/"
-RUN git clone --recursive https://github.com/facebookresearch/faiss
+RUN git clone https://github.com/facebookresearch/faiss
+#RUN git clone --recursive https://github.com/facebookresearch/faiss
+# https://github.com/facebookresearch/faiss
 # install faiss
 WORKDIR "/root/thirdparty/faiss"
 RUN git reset --hard 2dc30e14cfa76985ff8c2821c051f1725fe66afa
